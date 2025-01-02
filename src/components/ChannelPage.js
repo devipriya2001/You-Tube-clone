@@ -1,66 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import '../ChannelPage.js';
+import './ChannelPage.css';  
 
 const ChannelPage = () => {
-  const { channelId } = useParams();  // Get the channelId from the URL
+  const { channelId } = useParams();
   const [channelData, setChannelData] = useState(null);
-  const [videos, setVideos] = useState([]);
+  const [subscribed, setSubscribed] = useState(false);
 
-  // Fetch channel info and videos
   useEffect(() => {
+    // Fetch channel data (mock for now, replace with API call)
     const fetchChannelData = async () => {
-      try {
-        const response = await axios.get(`/api/channel/${channelId}`);
-        setChannelData(response.data.channel);
-        setVideos(response.data.videos);
-      } catch (error) {
-        console.error('Error fetching channel data:', error);
-      }
+      const response = await fetch(`/api/channel/${channelId}`);
+      const data = await response.json();
+      setChannelData(data);
     };
-
     fetchChannelData();
   }, [channelId]);
 
-  if (!channelData) {
-    return <div>Loading...</div>;
-  }
+  const handleSubscribe = () => {
+    setSubscribed(!subscribed);
+  };
+
+  if (!channelData) return <div>Loading...</div>;
 
   return (
-    <div className="channel-page">
-      <header className="channel-header">
-        <img
-          src={channelData.channelBanner}
-          alt="Channel Banner"
-          className="channel-banner"
-        />
-        <h1>{channelData.channelName}</h1>
-        <p>{channelData.description}</p>
-        <p>{channelData.subscribers} Subscribers</p>
-      </header>
-
-      <section className="videos">
-        <h2>Videos</h2>
-        <div className="video-grid">
-          {videos.map((video) => (
-            <div key={video.videoId} className="video-card">
-              <img
-                src={video.thumbnailUrl}
-                alt={video.title}
-                className="video-thumbnail"
-              />
-              <h3>{video.title}</h3>
-              <p>{video.views} Views</p>
-              {/* Buttons to edit or delete the video */}
-              <button>Edit</button>
-              <button>Delete</button>
-            </div>
-          ))}
+    <div className="channel-container">
+      {/* Channel Banner */}
+      <div className="channel-banner">
+        <img src={channelData.banner} alt="Channel Banner" />
+      </div>
+      
+      {/* Channel Info */}
+      <div className="channel-info">
+        <img className="channel-profile" src={channelData.profilePic} alt="Profile" />
+        <div>
+          <h1>{channelData.name}</h1>
+          <p>{channelData.subscribers} subscribers</p>
         </div>
-      </section>
+        <button 
+          className={subscribed ? 'subscribed' : 'subscribe-btn'} 
+          onClick={handleSubscribe}
+        >
+          {subscribed ? 'Subscribed' : 'Subscribe'}
+        </button>
+      </div>
+
+      {/* Videos Grid */}
+      <div className="video-grid">
+        {channelData.videos.map((video) => (
+          <div className="video-card" key={video._id}>
+            <img src={video.thumbnail} alt={video.title} />
+            <h3>{video.title}</h3>
+            <p>{video.views} views</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
 export default ChannelPage;
+

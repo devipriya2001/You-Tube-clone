@@ -15,6 +15,7 @@ import { dislike, fetchSuccess, like, fetchStart, fetchFailure} from "../redux/v
 import { format } from "timeago.js";
 import { subscription } from "../redux/userSlice";
 import Recommendation from "../components/Recommendation";
+import '../style.css'
 
 const Container = styled.div`
   display: flex;
